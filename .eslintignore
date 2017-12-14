@@ -1,0 +1,10 @@
+
+dist/*
+__tests__/*
+src/assets/*
+node_modules/*
+scripts/*
+config/*
+bin/*
+server/*
+
