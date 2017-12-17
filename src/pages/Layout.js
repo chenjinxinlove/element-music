@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import injectSheet from 'react-jss';
 import {observer} from 'mobx-react';
-import Layout from './Layout';
 
 const classes = {
   container: {

@@ -1,11 +1,13 @@
 import React from 'react';
+import classes from './classes';
+import injectSheet from 'react-jss';
 
 class Home extends React.Component {
   render() {
     return (
-      'ddddd'
+      <div className={classes.container} ref="container">kkk</div>
     );
   }
 }
 
-export default Home;
+export default injectSheet(classes)(Home);
