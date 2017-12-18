@@ -19,9 +19,10 @@ const classes = {
 @observer
 class Layout extends Component {
   render() {
+    const {classes, children} = this.props;
     return (
       <div className={classes.container} ref="container">
-        {this.props.children}
+        {children}
       </div>
     );
   }
