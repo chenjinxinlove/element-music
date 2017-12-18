@@ -23,6 +23,13 @@ export default class Loader extends Component {
   static defaultProps = {
     show: false
   };
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.show === this.props.show) {
+      return false;
+    }
+
+    return true;
+  }
   render() {
     const {show, classes} = this.props;
     let text = this.props.text || randomText[Math.floor(Math.random() * randomText.lenght)];

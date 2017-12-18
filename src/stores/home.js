@@ -1,7 +1,7 @@
 import {observable} from 'mobx';
 
 class Home {
-    @observable loading = true;
+    @observable loading = false;
 }
 const self = new Home();
 export default self;

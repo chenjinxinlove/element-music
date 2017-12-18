@@ -4,6 +4,7 @@ import injectSheet from 'react-jss';
 import { inject, observer } from 'mobx-react';
 
 import Loader from '../../components/Loader';
+import Header from '../../components/Header';
 
 @inject(stores => ({
   loading: stores.home.loading
@@ -17,6 +18,7 @@ class Home extends React.Component {
     return (
       <div className={classes.container} ref="container">
         <Loader show={loading} text="请等待。。。" />
+        <Header />
       </div>
     );
   }

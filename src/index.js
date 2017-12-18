@@ -6,6 +6,9 @@ import routes from './router';
 import theme from './theme';
 import {ThemeProvider} from 'react-jss';
 
+import 'ionicons201/css/ionicons.css';
+import './global.css';
+
 const router = (
   <Provider {...store}>
     {routes}
