@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import injectSheet from 'react-jss';
-import {observer} from 'mobx-react';
+import {observer, inject} from 'mobx-react';
 
 const classes = {
   container: {
@@ -16,8 +16,20 @@ const classes = {
   }
 };
 
+@inject(stores => ({
+  init: async() => {
+    await stores.preferences.init();
+    await stores.me.init();
+  }
+}))
+
 @observer
 class Layout extends Component {
+
+  async componentWillMount() {
+    await this.props.init();
+  }
+
   render() {
     const {classes, children} = this.props;
     return (
