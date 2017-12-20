@@ -6,16 +6,15 @@ class Home {
   @observable list = [];
   @action async load() {
     let res;
-    res = await axios.get(`api/home`);
+    res = await axios.get(`home`);
     self.list = res.data.list;
     return self.list;
   }
   @action async getList() {
     self.loading = true;
 
-    await self.loading();
-
-    self.getList = Function;
+    await self.load();
+    // self.getList = Function;
     self.loading = false;
   }
 }

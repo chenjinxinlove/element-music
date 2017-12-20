@@ -22,19 +22,19 @@ class Home extends React.Component {
   }
   renderItem(item) {
     return (
-      <div>{item}</div>
+      <div key={Math.random()}>{item}</div>
     );
   }
 
   renderLiked(item) {
     return (
-      <div>{item}</div>
+      <div key={Math.random()}>{item}</div>
     );
   }
 
   renderDaily(item) {
     return (
-      <div>{item}</div>
+      <div key={Math.random()}>{item}</div>
     );
   }
   renderPlaylist() {

@@ -1,6 +1,6 @@
 import {observable, action} from 'mobx';
 import axios from 'axios';
-
+axios.defaults.baseURL = `http://127.0.0.1:8000/`;
 import config from '../config';
 import storage from '../utils/storage.js';
 import theme from './../theme';
