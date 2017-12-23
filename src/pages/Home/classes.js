@@ -37,5 +37,54 @@ export default theme => ({
       21px 21px 0 rgba(227, 218, 219, 0.08),
       22px 22px 0 rgba(227, 218, 219, 0.07)
     `
+  },
+
+  item: {
+    position: 'relative',
+    display: 'inline-block',
+    minWidth: 130,
+    textAlign: 'right',
+    cursor: 'pointer',
+
+    '& img': {
+      width: 100,
+      height: 100,
+      borderRadius: 100,
+      pointerEvents: 'none',
+      transition: '.4s'
+    }
+  },
+
+  info: {
+    position: 'absolute',
+    top: 100,
+    right: 0,
+    textAlign: 'right',
+    color: '#fff',
+    opacity: 0,
+    transition: '1s',
+    transform: 'translateY(-16px)'
+  },
+
+  subtitle: {
+    display: 'inline-block',
+    padding: '4px 8px',
+    fontFamily: 'Roboto',
+    fontWeight: 'lighter',
+    fontSize: 11,
+    background: '#000'
+  },
+
+  title: {
+    display: '-webkit-box',
+    padding: '6px 8px',
+    background: '#000',
+    lineHeight: '16px',
+    whiteSpace: 'normal',
+    overflow: 'hidden',
+    textAlign: 'ellipsis',
+    transition: '.4s',
+    '-webkit-line-clamp': 3,
+    '-webkit-box-orient': 'vertical'
   }
 });

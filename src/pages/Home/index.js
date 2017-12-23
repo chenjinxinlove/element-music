@@ -4,7 +4,9 @@ import injectSheet from 'react-jss';
 import { inject, observer } from 'mobx-react';
 import Scroller from 'react-scroll-horizontal';
 import clazz from 'classnames';
+// import {Link} from 'react-router';
 
+import helper from '../../utils/helper';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 
@@ -21,37 +23,54 @@ class Home extends React.Component {
     this.props.getPlaylist();
   }
   renderItem(item) {
+    let {classes} = this.props;
+
     return (
-      <div key={Math.random()}>{item}</div>
+      <a
+        src={item.link}
+        className={clazz('clearfix')}
+      >
+        <img src={item.cover} />
+        <div className={classes.info}>
+          <span className={classes.subtitle}>
+            {
+              item.type === 0
+                ? `${helper.humanNunber(item.played)} 播放`
+                : `${item.size} 音频`
+            }
+          </span>
+          <div className={classes.title}>
+            {item.name}
+          </div>
+        </div>
+      </a>
     );
   }
 
-  renderLiked(item) {
-    return (
-      <div key={Math.random()}>{item}</div>
-    );
-  }
+  // renderLiked(item) {
+  //   return (
+  //     item
+  //   );
+  // }
 
-  renderDaily(item) {
-    return (
-      <div key={Math.random()}>{item}</div>
-    );
-  }
+  // renderDaily(item) {
+  //   return (
+  //     item
+  //   );
+  // }
   renderPlaylist() {
     let {classes, playlist, naturalScroll} = this.props;
     return (
       <Scroller reverseScroll={!naturalScroll}>
         {
-          playlist.map((e, index) => {
-            let isLiked = false;
-            let isDaily = false;
+          playlist.length === 0 ? '' : playlist.map((e, index) => {
+            // let isLiked = false;
+            // let isDaily = false;
 
             return (
               <div className={clazz('clearfix', classes.item)} key={index}>
                 {
-                  isLiked
-                  ? this.renderLiked(e)
-                  : (isDaily ? this.renderDaily(e) : this.renderItem(e))
+                  this.renderItem(e)
                 }
               </div>
             );
