@@ -1,13 +1,17 @@
 
 /* eslint-disable */
-let express = require('express');
-let apicache = require('apicache');
-let axios =require('axios');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import apicache from 'apicache'
+import axios from 'axios';
+/* eslint-enable */
 
 const app = express();
 const cache = apicache.middleware;
 const onlyStatus200 = (req, res) => res.statusCode === 200;
 const port = process.env.API_PORT || 8000;
+
+app.use(cookieParser());
 
 axios.defaults.baseURL = `http://localhost:${port}`;
 
@@ -17,11 +21,11 @@ app.use((req, res, next) => {
     next();
 });
 var allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Credentials','true');
-    next();
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Credentials','true');
+  next();
 };
 app.use(allowCrossDomain);
 // 获取专辑内容
@@ -86,21 +90,13 @@ app.use('/event', require('../NeteaseCloudMusicApi/router/event'));
 // 垃圾桶
 app.use('/fm_trash', require('../NeteaseCloudMusicApi/router/fm_trash'));
 
-app.use('/follow', require('../NeteaseCloudMusicApi/router/follow'));
-
 // 喜欢歌曲
 app.use('/like', require('../NeteaseCloudMusicApi/router/like'));
 
 app.use('/likelist', require('../NeteaseCloudMusicApi/router/likelist'));
 
-// 手机登录
-app.use('/login/cellphone', require('../NeteaseCloudMusicApi/router/loginCellphone'));
-
-// 邮箱登录
-app.use('/login', require('../NeteaseCloudMusicApi/router/login'));
-
 // 登录刷新
-app.use('/login/refresh', require('../NeteaseCloudMusicApi/router/login_refresh'));
+app.use('/login/refresh', cache('1 hour', onlyStatus200), require('../NeteaseCloudMusicApi/router/login_refresh'));
 
 // 不明 api
 app.use('/log/web', require('../NeteaseCloudMusicApi/router/logWeb'));
@@ -246,17 +242,30 @@ app.use('/user/subcount', require('../NeteaseCloudMusicApi/router/user_subcount'
 
 app.use('/user/record', require('../NeteaseCloudMusicApi/router/user_playrecord'));
 
-app.use('/home', cache('5 minutes', onlyStatus200), require('./router/home'));
-app.use('/player', cache('1 hour', onlyStatus200), require('./router/player'));
-app.use('/user', cache('1 hour', onlyStatus200), require('./router/user'));
-app.use('/artist', cache('1 hour', onlyStatus200), require('./router/artist'));
-app.use('/top', cache('1 hour', onlyStatus200), require('./router/top'));
-app.use('/playlist', cache('1 hour', onlyStatus200), require('./router/playlist'));
-app.use('/fm', require('./router/fm'));
+// New added
+app.use('/hot/album', require('./api/hot_album'));
+app.use('/subscribe', require('./api/subscribe'));
+app.use('/unsubscribe', require('./api/unsubscribe'));
+app.use('/follow', require('./api/follow'));
+app.use('/unfollow', require('./api/unfollow'));
+app.use('/sub', require('./api/sub'));
+app.use('/unsub', require('./api/unsub'));
+app.use('/login/cellphone', require('./api/loginCellphone'));
+app.use('/login', require('./api/login'));
 
-app.listen(port, () => {
-    console.log(`server running @${port}`);
-  });
+app.use('/api/home', cache('5 minutes', onlyStatus200), require('./router/home'));
+app.use('/api/player', require('./router/player'));
+app.use('/api/user', require('./router/user'));
+app.use('/api/artist', require('./router/artist'));
+app.use('/api/top', cache('1 hour', onlyStatus200), require('./router/top'));
+app.use('/api/playlist', cache('10 minutes', onlyStatus200), require('./router/playlist'));
+app.use('/api/fm', require('./router/fm'));
+app.use('/api/search', require('./router/search'));
+app.use('/api/comments', require('./router/comments'));
 
-module.exports = app;
+// if (process.env.AUTORUN) {
+    console.log(`API Server run with port: ${port}`);
+    app.listen(port);
+// }
 
+export default app;

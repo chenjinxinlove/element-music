@@ -9,6 +9,7 @@ import clazz from 'classnames';
 import helper from '../../utils/helper';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
+import Controller from '../../components/Controller';
 
 @injectSheet(classes)
 @inject(stores => ({
@@ -35,7 +36,7 @@ class Home extends React.Component {
           <span className={classes.subtitle}>
             {
               item.type === 0
-                ? `${helper.humanNunber(item.played)} 播放`
+                ? `${helper.humanNumber(item.played)} 播放`
                 : `${item.size} 音频`
             }
           </span>
@@ -108,6 +109,8 @@ class Home extends React.Component {
             }
           </div>
         </main>
+
+        <Controller />
       </div>
     );
   }

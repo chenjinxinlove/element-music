@@ -1,186 +1,266 @@
 
+/* eslint-disable */
 import express from 'express';
+import apicache from 'apicache'
 import axios from 'axios';
 import _debug from 'debug';
+import search from '../search';
+/* eslint-enable */
 
 const debug = _debug('dev:api');
 const error = _debug('dev:error');
 const router = express();
+const cache = apicache.middleware;
+const onlyStatus200 = (req, res) => res.statusCode === 200;
 
 async function getRecentUser(id) {
-    // Get the recent user that played this song
-    var response = await axios(`/simi/user?id=${id}`);
     var users = [];
 
-    if (response.data.code !== 200) {
-        error('Failed to get recent user: %O', response.data);
-    } else {
-        response.data.userprofiles.map(e => {
-            users.push({
-                id: e.userId,
-                name: e.nickname,
-                avatar: `${e.avatarUrl}?param=50y50`,
-                link: `/user/${e.userId}`,
+    try {
+        // Get the recent user that played this song
+        let response = await axios(`/simi/user?id=${id}`);
+
+        if (response.data.code !== 200) {
+            throw response.data;
+        } else {
+            response.data.userprofiles.map(e => {
+                users.push({
+                    id: e.userId.toString(),
+                    name: e.nickname,
+                    avatar: `${e.avatarUrl}?param=50y50`,
+                    link: `/user/${e.userId}`,
+                });
             });
-        });
+        }
+    } catch (ex) {
+        error('Failed to get recent user: %O', ex);
     }
 
     return users;
 }
 
 async function getSimilarArtist(id) {
-    var response = await axios.get(`/simi/artist?id=${id}`);
     var artists = [];
 
-    if (response.data.code === 200) {
-        response.data.artists.map(e => {
-            artists.push({
-                id: e.id,
-                name: e.name,
-                avatar: `${e.picUrl}?param=50y50`,
-                link: `/artist/${e.id}`,
+    try {
+        let response = await axios.get(`/simi/artist?id=${id}`);
+
+        if (response.data.code === 200) {
+            response.data.artists.map(e => {
+                artists.push({
+                    id: e.id.toString(),
+                    name: e.name,
+                    avatar: `${e.picUrl}?param=50y50`,
+                    // Broken link
+                    link: e.id ? `/artist/${e.id}` : '',
+                });
             });
-        });
-    } else {
-        error('Failed to get similar artist: %O', response.data);
+        } else {
+            throw response.data;
+        }
+    } catch (ex) {
+        error('Failed to get similar artist: %O', ex);
     }
 
     return artists;
 }
 
 async function getSimilarPlaylist(id) {
-    var response = await axios.get(`/simi/playlist?id=${id}`);
     var playlists = [];
 
-    if (response.data.code !== 200) {
-        error('Failed to get similar playlist: %O', response.data);
-    } else {
-        response.data.playlists.map(e => {
-            playlists.push({
-                id: e.id,
-                name: e.name,
-                cover: e.coverImgUrl,
-                link: `/player/0/${e.id}`,
+    try {
+        let response = await axios.get(`/simi/playlist?id=${id}`);
+
+        if (response.data.code !== 200) {
+            throw response.data;
+        } else {
+            response.data.playlists.map(e => {
+                playlists.push({
+                    id: e.id.toString(),
+                    name: e.name,
+                    cover: e.coverImgUrl,
+                    link: `/player/0/${e.id}`,
+                });
             });
-        });
+        }
+    } catch (ex) {
+        error('Failed to get similar playlist: %O', ex);
     }
 
     return playlists;
 }
 
 async function getAlbumBySong(id) {
-    var response = await axios.get(`/simi/song?id=${id}`);
     var albums = [];
 
-    if (response.data.code !== 200) {
-        error('Failed to get similar song: %O', response.data);
-    } else {
-        response.data.songs.map(e => {
-            var album = e.album;
+    try {
+        let response = await axios.get(`/simi/song?id=${id}`);
 
-            albums.push({
-                id: album.id,
-                name: album.name,
-                cover: album.picUrl,
-                link: `/player/1/${album.id}`
+        if (response.data.code !== 200) {
+            throw response.data;
+        } else {
+            response.data.songs.map(e => {
+                var album = e.album;
+
+                albums.push({
+                    id: album.id.toString(),
+                    name: album.name,
+                    cover: album.picUrl,
+                    link: `/player/1/${album.id}`
+                });
             });
-        });
+        }
+    } catch (ex) {
+        error('Failed to get similar song: %O', ex);
     }
 
     return albums;
 }
 
-router.get('/:type/:id', async(req, res) => {
-    debug('Handle request for /player');
-
-    /**
-     * O: playlist
-     * 1: album
-     * */
-    var type = +req.params.type;
-    var id = req.params.id;
-
-    debug('Params \'type\': %s', type);
-    debug('Params \'id\': %s', id);
-
-    var response = await axios.get(type === 0 ? '/playlist/detail' : '/album', {
+async function getFlac(name, artists) {
+    var response = await axios.get('http://sug.music.baidu.com/info/suggestion', {
         params: {
-            id
+            word: name,
+            version: 2,
+            from: 0,
+        }
+    });
+    var songs = response.data.data.song;
+    var song = songs.find(e => artists.indexOf(e.artistname) > -1);
+
+    if (!song) {
+        return false;
+    }
+    response = await axios.get('http://music.baidu.com/data/music/fmlink', {
+        params: {
+            songIds: song.songid,
+            type: 'flac',
         },
     });
-    var data = response.data;
-    var meta = {};
-    var songs = [];
 
-    if (data.code !== 200) {
-        debug('Failed to get player songs: %O', data);
-    } else {
-        songs = (data.songs || data.playlist.tracks).map(e => {
-            // eslint-disable-next-line
-            var { al /* Album */, ar /* Artist */ } = e;
+    debug('FLAC: %O', response.data.data.songList);
+    return response.data.data.songList[0].songLink;
+}
 
-            return {
-                id: e.id,
-                name: e.name,
-                duration: e.dt,
-                album: {
-                    id: al.id,
-                    name: al.name,
-                    cover: `${al.picUrl}?param=y100y100`,
-                    link: `/player/1/${al.id}`
-                },
-                artists: ar.map(e => ({
-                    id: e.id,
-                    name: e.name,
-                    link: `/artist/${e.id}`,
-                }))
-            };
-        });
+router.get('/subscribe/:id', async(req, res) => {
+    debug('Handle request for /player/subscribe');
 
-        if (type === 0) {
-            // User's playlist
-            meta = data.playlist;
+    var id = req.params.id;
+    var success = false;
 
-            meta = {
-                name: meta.name,
-                size: meta.trackCount,
-                cover: `${meta.coverImgUrl}?param=300y300`,
-                author: [{
-                    id: meta.creator.userId,
-                    name: meta.creator.nickname,
-                    link: `/user/${meta.creator.userId}`,
-                }],
-                played: meta.playCount,
-                subscribed: meta.subscribed
-            };
-        } else {
-            // Album
-            meta = data.album;
+    debug('Params \'id\': %s', id);
 
-            meta = {
-                name: meta.name,
-                size: meta.size,
-                cover: `${meta.picUrl}?param=300y300`,
-                author: meta.artists.map(e => ({
-                    id: e.id,
-                    name: e.name,
-                    link: `/artist/${e.id}`,
-                })),
-                company: meta.company,
-                subscribed: meta.info.liked,
-            };
+    try {
+        let response = await axios.get(`/subscribe/?id=${id}`);
+        let data = response.data;
+
+        success = data.code === 200;
+
+        if (data.code !== 200) {
+            throw data;
         }
+    } catch (ex) {
+        error('Failed to subscribe playlist: %O', ex);
     }
 
     res.send({
-        id,
-        type,
-        meta,
-        songs,
+        success,
     });
 });
 
-router.get('/related/:songid/:artistid', async(req, res) => {
+router.get('/unsubscribe/:id', async(req, res) => {
+    debug('Handle request for /player/unsubscribe');
+
+    var id = req.params.id;
+    var success = false;
+
+    debug('Params \'id\': %s', id);
+
+    try {
+        let response = await axios.get(`/unsubscribe/?id=${id}`);
+        let data = response.data;
+
+        success = data.code === 200;
+
+        if (data.code !== 200) {
+            throw data;
+        }
+    } catch (ex) {
+        error('Failed to unsubscribe playlist: %O', ex);
+    }
+
+    res.send({
+        success,
+    });
+});
+
+router.get('/song/:id/:name/:artists/:flac?', cache('3 minutes', onlyStatus200), async(req, res) => {
+    debug('Handle request for /player/song');
+
+    var id = req.params.id;
+    var name = req.params.name;
+    var artists = req.params.artists;
+    var flac = req.params.flac || 0;
+    var song = {};
+
+    debug('Params \'id\': %s, \'name\': %s, \'artists\': %s, \'flac\': %s', id, name, artists, flac);
+
+    try {
+        if (+flac) {
+            let src = await getFlac(name, artists);
+
+            if (src) {
+                res.send({
+                    song: {
+                        src,
+                        isFlac: true,
+                    }
+                });
+
+                return;
+            }
+        }
+    } catch (ex) {
+        debug('Failed to get flac file: %O', ex);
+    }
+
+    try {
+        let response = await axios.get(`/music/url?id=${id}`);
+        let data = response.data;
+
+        if (data.code !== 200) {
+            throw data;
+        }
+
+        song = data.data[0];
+        song = {
+            id: song.id.toString(),
+            src: song.url,
+            md5: song.md5,
+            bitRate: song.br,
+        };
+
+        if (!song.src) {
+            throw new Error('No Copyright');
+        }
+    } catch (ex) {
+        try {
+            // Search from other source
+            debug('Search: %s, %s', name, artists);
+            song = await search(name, artists);
+        } catch (ex) {
+            error('Failed to get song URL: %O', ex);
+        }
+    }
+
+    debug('Resolve song: %O', song);
+
+    res.send({
+        song,
+    });
+});
+
+router.get('/related/:songid/:artistid', cache('10 minutes', onlyStatus200), async(req, res) => {
     debug('Handle request for /player/related');
 
     var songid = req.params.songid;
@@ -201,6 +281,100 @@ router.get('/related/:songid/:artistid', async(req, res) => {
         users,
         artists,
         playlists,
+    });
+});
+
+router.get('/:type/:id', async(req, res) => {
+    debug('Handle request for /player');
+
+    /**
+     * O: playlist
+     * 1: album
+     * */
+    var type = +req.params.type;
+    var id = req.params.id;
+    var meta = {};
+    var songs = [];
+
+    debug('Params \'type\': %s', type);
+    debug('Params \'id\': %s', id);
+
+    try {
+        let response = await axios.get(type === 0 ? '/playlist/detail' : '/album', {
+            params: {
+                id
+            },
+        });
+        let data = response.data;
+
+        if (data.code !== 200) {
+            throw data;
+        } else {
+            songs = (data.songs || data.playlist.tracks).map(e => {
+                // eslint-disable-next-line
+                var { al /* Album */, ar /* Artist */ } = e;
+
+                return {
+                    id: e.id.toString(),
+                    name: e.name,
+                    duration: e.dt,
+                    album: {
+                        id: al.id.toString(),
+                        name: al.name,
+                        cover: `${al.picUrl}?param=y100y100`,
+                        link: `/player/1/${al.id}`
+                    },
+                    artists: ar.map(e => ({
+                        id: e.id.toString(),
+                        name: e.name,
+                        // Broken link
+                        link: e.id ? `/artist/${e.id}` : '',
+                    }))
+                };
+            });
+
+            if (type === 0) {
+                // User's playlist
+                meta = data.playlist;
+
+                meta = {
+                    name: meta.name,
+                    size: meta.trackCount,
+                    cover: meta.coverImgUrl,
+                    author: [{
+                        id: meta.creator.userId.toString(),
+                        name: meta.creator.nickname,
+                        link: `/user/${meta.creator.userId}`,
+                    }],
+                    played: meta.playCount,
+                    subscribed: meta.subscribed
+                };
+            } else {
+                // Album
+                meta = data.album;
+
+                meta = {
+                    name: meta.name,
+                    size: meta.size,
+                    cover: meta.picUrl,
+                    author: meta.artists.map(e => ({
+                        id: e.id.toString(),
+                        name: e.name,
+                        // Broken link
+                        link: e.id ? `/artist/${e.id}` : '',
+                    })),
+                    company: meta.company,
+                    subscribed: meta.info.liked,
+                };
+            }
+        }
+    } catch (ex) {
+        error('Failed to get player songs: %O', ex);
+    }
+
+    res.send({
+        meta: Object.assign({}, meta, { id, type }),
+        songs,
     });
 });
 
