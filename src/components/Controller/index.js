@@ -41,6 +41,26 @@ class Controller extends Component {
               src: 'sss'
             }} />
           </Link>
+
+          <aside>
+            <div className={classes.info}>
+              <p className={classes.title}>
+                <Link to={song.album.link}>{song.name}</Link>
+              </p>
+
+              <p className={classes.author}>
+                {
+                  song.artists.map((e, index) => {
+                    return (
+                      <Link key={index} to={e.link}>
+                        {e.name}
+                      </Link>
+                    )
+                  })
+                }
+              </p>
+            </div>
+          </aside>
         </section>
       </div>
     );
