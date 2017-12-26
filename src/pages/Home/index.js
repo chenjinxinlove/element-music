@@ -72,24 +72,48 @@ class Home extends React.Component {
   //   );
   // }
 
-  // renderDaily(item) {
-  //   return (
-  //     item
-  //   );
-  // }
+  renderDaily(item) {
+    let { classes, isPlaying, canitoggle, toggle, play } = this.props;
+    let playing = isPlaying(item.id);
+
+    return (
+      <div
+        className={clazz('clearfix', classes.daily, {
+          [classes.playing]: playing,
+        })}
+        onClick={e => canitoggle(item.id) ? toggle() : play(item)}>
+        <div className={classes.mask}>
+          {
+            playing
+              ? <i className="ion-ios-pause" />
+              : <i className="ion-ios-play" />
+          }
+        </div>
+
+        <div className={classes.info}>
+          <span className={classes.subtitle}>
+            {item.size} Tracks
+          </span>
+          <div className={classes.title}>
+            {item.name}
+          </div>
+        </div>
+      </div>
+    );
+  }
   renderPlaylist() {
     let {classes, playlist, naturalScroll} = this.props;
     return (
       <Scroller reverseScroll={!naturalScroll}>
         {
           playlist.length === 0 ? '' : playlist.map((e, index) => {
-            // let isLiked = false;
-            // let isDaily = false;
+            //  let isLiked = false;
+            let isDaily = true && index === 1;
 
             return (
               <div className={clazz('clearfix', classes.item)} key={index}>
                 {
-                  this.renderItem(e)
+                  isDaily ? this.renderDaily(e) : this.renderItem(e)
                 }
               </div>
             );
