@@ -1,6 +1,4 @@
-/**
- * Created by chenjinxin on 2017/12/24.
- */
+
 import colors from '../../utils/colors';
 
 export default theme => {
@@ -17,7 +15,7 @@ export default theme => {
       '& section': {
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
       },
 
       '& aside': {
@@ -30,7 +28,7 @@ export default theme => {
 
         '& p': {
           margin: 0,
-          padding: 0
+          padding: 0,
         }
       }
     },
@@ -39,11 +37,11 @@ export default theme => {
       width: '100vw',
       cursor: 'pointer',
 
-      '&, & $palying, & $buffering': {
+      '&, & $playing, & $buffering': {
         position: 'fixed',
         left: 0,
         bottom: 50,
-        height: 2
+        height: 2,
       },
 
       '& $playing': {
@@ -67,7 +65,7 @@ export default theme => {
         fontSize: 12,
         color: '#fff',
         background: '#000',
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
       },
 
       '& $buffering': {
@@ -76,11 +74,122 @@ export default theme => {
         backgroundPosition: 0,
         opacity: .2,
         transform: 'translate3d(-100%, 0, 0)',
-        transition: 'transform .2s ease-out'
-      }
+        transition: 'transform .2s ease-out',
+      },
     },
 
     playing: {},
-    buffering: {}
+    buffering: {},
+
+    info: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+
+      '& a': {
+        display: 'inline-block',
+        paddingBottom: 2,
+        borderBottom: 'thin solid rgba(255, 255, 255, 0)',
+        transition: '.2s',
+
+        '&:hover': {
+          borderBottomColor: '#000',
+        },
+      }
+    },
+
+    title: {
+      marginBottom: '3px !important',
+
+      '& a': {
+        paddingBottom: 1,
+        maxWidth: 400,
+        fontSize: 13,
+        color: '#081600',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }
+    },
+
+    author: {
+      marginTop: 2,
+      fontSize: 11,
+      maxWidth: 400,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+
+      '& a': {
+        color: '#4a4a4a',
+
+        '&:after': {
+          content: '"/"',
+          display: 'inline-block',
+          margin: '0 5px',
+        },
+      },
+
+      '& a:last-child:after': {
+        content: 'none',
+      }
+    },
+
+    action: {
+      '& i': {
+        display: 'inline-block',
+        height: 24,
+        width: 24,
+        lineHeight: '24px',
+        marginRight: 16,
+        fontSize: 16,
+        color: '#4a4a4a',
+        textAlign: 'center',
+        cursor: 'pointer',
+        transition: '.2s',
+      },
+
+      '& i:hover': {
+        color: theme.controller.hoverColor,
+      },
+
+      '& i$liked': {
+        color: colors.pallet.grape,
+        textShadow: `0 0 24px ${colors.pallet.grape}`,
+      }
+    },
+
+    highquality: {
+      display: 'inline-block',
+      padding: '2px 6px',
+      marginRight: 30,
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+      fontFamily: 'Roboto',
+      fontSize: 12,
+      color: colors.pallet.dribbble,
+      border: `thin solid ${colors.pallet.dribbble}`,
+      textShadow: `0 0 24px ${colors.pallet.dribbble}`,
+      transform: 'translateY(-3px)',
+      zoom: .8,
+    },
+
+    liked: { },
+
+    mode: {
+      color: '#4a4a4a',
+    },
+
+    controls: {
+      display: 'inline-block',
+      marginLeft: 16,
+      color: '#000',
+    },
+
+    toggle: {
+      '& i': {
+        color: '#9b9b9b',
+      }
+    },
   };
 };

@@ -1,3 +1,15 @@
+
+const pallet = {
+  primary: '#6496f0',
+  sunflower: '#ffce54',
+  grape: '#e0245e',
+  coral: '#ff6470',
+  mint: '#48cfad',
+  dribbble: '#ea4c89',
+  twitter: '#55acee',
+  google: '#039be5',
+};
+
 const gradients = [
   'linear-gradient(to right, #0099f7, #f11712)',
   'linear-gradient(to bottom, #834d9b, #d04ed6)',
@@ -16,6 +28,8 @@ const gradients = [
 ];
 
 export default {
+  pallet,
+
   randomGradient() {
     return gradients[Math.floor(Math.random() * gradients.length)];
   }

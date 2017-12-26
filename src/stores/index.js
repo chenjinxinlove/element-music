@@ -1,11 +1,13 @@
 import home from './home';
 import me from './me';
 import preferences from './preferences';
+import controller from './controller';
 
-const store = {
+const stores = {
   home,
   me,
-  preferences
+  preferences,
+  controller
 };
 
-export default store;
+export default stores;

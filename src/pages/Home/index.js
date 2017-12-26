@@ -17,6 +17,22 @@ import Controller from '../../components/Controller';
   playlist: stores.home.list,
   getPlaylist: stores.home.getList,
   naturalScroll: stores.preferences.naturalScroll,
+  play: (playlist) => {
+    let controller = stores.controller;
+
+    controller.setup(playlist);
+    controller.play();
+  },
+  toggle: stores.controller.toggle,
+  isPlaying: (id) => {
+    let controller = stores.controller;
+
+    return controller.playing
+      && controller.playlist.id === id;
+  },
+  canitoggle: (id) => {
+    return stores.controller.playlist.id === id;
+  }
 }))
 @observer
 class Home extends React.Component {
@@ -24,12 +40,14 @@ class Home extends React.Component {
     this.props.getPlaylist();
   }
   renderItem(item) {
-    let {classes} = this.props;
+    let {classes, isPlaying} = this.props;
 
     return (
       <a
         src={item.link}
-        className={clazz('clearfix')}
+        className={clazz('clearfix', {
+          [classes.playing]: isPlaying(item.id),
+        })}
       >
         <img src={item.cover} />
         <div className={classes.info}>
