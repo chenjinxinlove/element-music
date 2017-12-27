@@ -8,7 +8,7 @@ import {Link} from 'react-router-dom';
 import clazz from 'classnames';
 
 import classes from './classes';
-import ProgressImage from '../ProgressImage';
+import ProgressImage from '../../uiComponents/ProgressImage';
 import {PLAYER_LOOP, PLAYER_SHUFFLE, PLAYER_REPEAT} from '../../stores/controller';
 
 @injectSheet(classes)
@@ -18,7 +18,7 @@ import {PLAYER_LOOP, PLAYER_SHUFFLE, PLAYER_REPEAT} from '../../stores/controlle
   next: stores.controller.next,
   prev: stores.controller.prev,
   toggle: stores.controller.toggle,
-  palying: stores.controller.palying,
+  playing: stores.controller.playing,
   changeMode: stores.controller.changeMode,
   getPlayerLink: () => {
     return stores.controller.playlist.link;
@@ -36,7 +36,7 @@ class Controller extends Component {
   }
 
   render() {
-    let {classes, song, mode, prev, next, toggle, showComments, playing} = this.props;
+    let {classes, song, mode, prev, next, toggle, showComments, playing, getPlayerLink} = this.props;
     console.log(song);
     if (!song.id) {
       return false;
@@ -56,7 +56,7 @@ class Controller extends Component {
           <Link
             className="tooltip"
             data-text="ddd"
-            to=""
+            to={getPlayerLink()}
           >
             <ProgressImage {...{
               height: 50,
@@ -103,7 +103,7 @@ class Controller extends Component {
                 onClick={this.props.changeMode} />
 
               <div className={classes.controls}>
-                <i className="ion-ios-render"
+                <i className="ion-ios-rewind"
                   onClick={prev} />
 
                 <span

@@ -7,7 +7,7 @@ import clazz from 'classnames';
 // import {Link} from 'react-router';
 
 import helper from '../../utils/helper';
-import Loader from '../../components/Loader';
+import Loader from '../../uiComponents/Loader';
 import Header from '../../components/Header';
 import Controller from '../../components/Controller';
 
@@ -19,7 +19,6 @@ import Controller from '../../components/Controller';
   naturalScroll: stores.preferences.naturalScroll,
   play: (playlist) => {
     let controller = stores.controller;
-
     controller.setup(playlist);
     controller.play();
   },
@@ -108,7 +107,7 @@ class Home extends React.Component {
         {
           playlist.length === 0 ? '' : playlist.map((e, index) => {
             //  let isLiked = false;
-            let isDaily = true && index === 1;
+            let isDaily = true && index === 0;
 
             return (
               <div className={clazz('clearfix', classes.item)} key={index}>

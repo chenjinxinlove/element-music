@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import injectSheet from 'react-jss';
 import {observer, inject} from 'mobx-react';
 
+import AudioPlayer from '../components/AudioPlayer';
+
 const classes = {
   container: {
     position: 'fixed',
@@ -35,6 +37,7 @@ class Layout extends Component {
     return (
       <div className={classes.container} ref="container">
         {children}
+        <AudioPlayer />
       </div>
     );
   }
