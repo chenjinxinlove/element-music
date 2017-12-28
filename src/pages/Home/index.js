@@ -4,7 +4,6 @@ import injectSheet from 'react-jss';
 import { inject, observer } from 'mobx-react';
 import Scroller from 'react-scroll-horizontal';
 import clazz from 'classnames';
-// import {Link} from 'react-router';
 
 import helper from '../../utils/helper';
 import Loader from '../../uiComponents/Loader';
