@@ -64,12 +64,6 @@ class Home extends React.Component {
     );
   }
 
-  // renderLiked(item) {
-  //   return (
-  //     item
-  //   );
-  // }
-
   renderDaily(item) {
     let { classes, isPlaying, canitoggle, toggle, play } = this.props;
     let playing = isPlaying(item.id);
